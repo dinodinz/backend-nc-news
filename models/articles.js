@@ -17,7 +17,7 @@ exports.selectArticleById = (params) => {
         return Promise.reject({
           status: 404,
           error: "Not found",
-          msg: "Article ID does not exist",
+          detail: "Article ID does not exist",
         });
       } else return result.rows[0];
     })
