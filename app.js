@@ -1,16 +1,16 @@
 const express = require("express");
 const app = express();
 const { getAllTopics } = require("./controllers/topics");
-const { getArticleById } = require("./controllers/articles");
+const { getArticleById, getAllArticles } = require("./controllers/articles");
 const endpoints = require("./endpoints.json");
-
-app.use(express.json());
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints });
 });
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 
@@ -24,12 +24,10 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
-    res
-      .status(400)
-      .send({
-        error: "Bad Request",
-        msg: "Invalid input syntax for Article ID",
-      });
+    res.status(400).send({
+      error: "Bad Request",
+      msg: "Invalid input syntax for Article ID",
+    });
   } else next(err);
 });
 
