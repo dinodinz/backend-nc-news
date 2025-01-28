@@ -133,12 +133,16 @@ describe("GET /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("200: Should respond with 200 status when successfully fetching all comments for the specified article_id with their respective object properties", () => {
+  test(`200: Should respond with 200 status when successfully fetching all comments 
+             from the specified article_id which should have their respective object properties and must be
+             sorted by created_at in descending order by default `, () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { allComments } }) => {
-        expect(Array.isArray(allComments)).toBe(true); //value returned should be an array
+        expect(Array.isArray(allComments)).toBe(true); //checks if value returned should be an array
+        expect(allComments).toBeSortedBy("created_at", { descending: true }); //checks if response array is sorted by created_at using descending order
+
         allComments.forEach((comment) => {
           expect(comment).toEqual(
             expect.objectContaining({
@@ -151,15 +155,6 @@ describe("GET /api/articles/:article_id/comments", () => {
             })
           );
         });
-      });
-  });
-
-  test("200: Should respond with an array of all comments in descending order where the most recent comment comes first", () => {
-    return request(app)
-      .get("/api/articles/1/comments")
-      .expect(200)
-      .then(({ body: { allComments } }) => {
-        expect(allComments).toBeSortedBy("created_at", { descending: true });
       });
   });
 
