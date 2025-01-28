@@ -131,3 +131,45 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Should respond with 200 status when successfully fetching all comments for the specified article_id with their respective object properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { allComments } }) => {
+        expect(Array.isArray(allComments)).toBe(true); //value returned should be an array
+        allComments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+
+  test("200: Should respond with an array of all comments in descending order where the most recent comment comes first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { allComments } }) => {
+        expect(allComments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if the request was carrying a different format for article_id", () => {
+    return request(app)
+      .get("/api/articles/A/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid input syntax for Article ID");
+      });
+  });
+});
