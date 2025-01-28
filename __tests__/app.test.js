@@ -173,3 +173,83 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Should respond with 201 status along with the posted comment when successfully posting a comment for an article", () => {
+    const payload = { username: "icellusedkars", body: "I AM GROOOT!!" };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(payload)
+      .expect(201)
+      .then(({ body: { postedComment } }) => {
+        expect(postedComment).toBe("I AM GROOOT!!");
+      });
+  });
+
+  test("404: Should respond with 404 Not Found if article ID is valid but doesn't exist", () => {
+    const payload = { username: "icellusedkars", body: "I AM GROOOT!!" };
+
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found");
+        expect(response.body.msg).toBe(
+          'Key (article_id)=(999) is not present in table "articles".'
+        ); //not sure if this is the right approach to test as i am mapping msg to detail which might be dynamic
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if the article ID carried on the request was using a different format", () => {
+    const payload = { username: "icellusedkars", body: "I AM GROOOT!!" };
+
+    return request(app)
+      .post("/api/articles/A/comments")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid input syntax for Article ID");
+      });
+  });
+
+  test("404: Should respond with 404 Not found if the username on the request body is not an existing username on the users table, this goes the same for blank username values", () => {
+    const payload = { username: "Groot", body: "I AM GROOOT!!" };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found");
+        expect(response.body.msg).toBe(
+          'Key (author)=(Groot) is not present in table "users".'
+        );
+      });
+  });
+
+  test("400: Should respond with 400 Bad request if the username or body key value pairs was not on the request body", () => {
+    const payload = { body: "I AM GROOOT!!" };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid request body format");
+      });
+  });
+
+  test("400: Should respond with 400 Bad request if there was no request body sent", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid request body format");
+      });
+  });
+});
