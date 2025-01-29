@@ -101,7 +101,7 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax for Article ID");
+        expect(response.body.msg).toBe("Invalid input syntax");
       });
   });
 });
@@ -164,7 +164,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax for Article ID");
+        expect(response.body.msg).toBe("Invalid input syntax");
       });
   });
 
@@ -226,7 +226,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then((response) => {
         expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax for Article ID");
+        expect(response.body.msg).toBe("Invalid input syntax");
       });
   });
 
@@ -265,6 +265,98 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then((response) => {
         expect(response.body.error).toBe("Bad Request");
         expect(response.body.msg).toBe("Invalid request body format");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Should respond with 200 status along with the updated article object with updated vote value", () => {
+    const payload = { inc_votes: 100 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(payload)
+      .expect(200)
+      .then(({ body: { editedArticle } }) => {
+        console.log(editedArticle);
+        expect(editedArticle.votes).toBe(200);
+        expect(editedArticle).toEqual(
+          expect.objectContaining({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          })
+        );
+      });
+  });
+
+  test("200: Should respond with 200 status and decrement the current vote value if a negative value was sent for inc_votes then return the updated article object", () => {
+    const payload = { inc_votes: -300 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(payload)
+      .expect(200)
+      .then(({ body: { editedArticle } }) => {
+        console.log(editedArticle);
+        expect(editedArticle.votes).toBe(-200);
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if the request was carrying a different format for article_id", () => {
+    const payload = { inc_votes: 100 };
+
+    return request(app)
+      .patch("/api/articles/A")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid input syntax");
+      });
+  });
+
+  test("404: Should respond with 404 Not found if the request was carrying a valid but not an existing article_id", () => {
+    const payload = { inc_votes: 100 };
+
+    return request(app)
+      .patch("/api/articles/999")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found");
+        expect(response.body.msg).toBe("Article ID does not exist");
+      });
+  });
+
+  test("400: Should respond with 400 Bad request if the request payload didnt have values OR if there was no request body sent at all", () => {
+    const payload = {};
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid request body format");
+      });
+  });
+
+  test("400: Should respond with 400 Bad request if the request payload has a different format than what the server expects", () => {
+    const payload = { inc_votes: "A" };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid input syntax");
       });
   });
 });
