@@ -394,3 +394,24 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("200: Responds with an array of user objects which should have the keys 'username','name' and 'avatar_url'", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { allUsers } }) => {
+        expect(Array.isArray(allUsers)).toBe(true);
+
+        allUsers.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
