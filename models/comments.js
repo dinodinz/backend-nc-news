@@ -1,5 +1,6 @@
 const { request } = require("../app");
 const db = require("../db/connection");
+const { checkArticleIdExists } = require("../db/seeds/utils");
 
 exports.fetchCommentsByArticleId = (params) => {
   let { article_id } = params;
@@ -7,8 +8,10 @@ exports.fetchCommentsByArticleId = (params) => {
       WHERE article_id = $1 
       ORDER BY created_at DESC`;
 
-  return db.query(SQL, [article_id]).then((result) => {
-    return result.rows;
+  return checkArticleIdExists(article_id).then((result) => {
+    return db.query(SQL, [article_id]).then((result) => {
+      return result.rows;
+    });
   });
 };
 
