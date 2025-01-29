@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkArticleIdExists } = require("../db/seeds/utils");
 
 exports.selectArticleById = (params) => {
   let { article_id } = params;
@@ -42,5 +43,23 @@ exports.selectAllArticles = () => {
 
   return db.query(SQL).then((result) => {
     return result.rows;
+  });
+};
+
+exports.editArticleById = (reqBody, params) => {
+  const { inc_votes } = reqBody;
+  const { article_id } = params;
+  const values = [inc_votes, article_id];
+
+  const SQL = `UPDATE articles
+      SET
+        votes = votes + $1 
+      WHERE article_id = $2
+      RETURNING *`;
+
+  return checkArticleIdExists(article_id).then((result) => {
+    return db.query(SQL, values).then((result) => {
+      return result.rows[0];
+    });
   });
 };
