@@ -1,7 +1,11 @@
 const express = require("express");
 const app = express();
 const { getAllTopics } = require("./controllers/topics");
-const { getArticleById, getAllArticles } = require("./controllers/articles");
+const {
+  getArticleById,
+  getAllArticles,
+  updateArticleById,
+} = require("./controllers/articles");
 const {
   getCommentsByArticleId,
   addCommentByArticleId,
@@ -9,11 +13,12 @@ const {
 const endpoints = require("./endpoints.json");
 app.use(express.json());
 
+//GET
+
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints });
 });
 
-//GET
 app.get("/api/topics", getAllTopics);
 
 app.get("/api/articles", getAllArticles);
@@ -25,13 +30,16 @@ app.get("/api/articles/:article_id", getArticleById);
 //POST
 app.post("/api/articles/:article_id/comments", addCommentByArticleId);
 
+//PATCH
+app.patch("/api/articles/:article_id", updateArticleById);
+
 //middleware error handlers
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({
       error: "Bad Request",
-      msg: "Invalid input syntax for Article ID",
+      msg: "Invalid input syntax",
     });
   } else next(err);
 });
