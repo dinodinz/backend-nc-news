@@ -4,6 +4,7 @@ const {
   createRef,
   formatComments,
   checkArticleIdExists,
+  checkCommentIdExists,
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -121,6 +122,26 @@ describe("checkArticleIdExists()", () => {
 
     return expect(checkArticleIdExists(articleId)).rejects.toEqual({
       detail: "Article ID does not exist",
+      error: "Not found",
+      status: 404,
+    });
+  });
+});
+
+describe("checkCommentIdExists()", () => {
+  test("Should resolve with a value of 'Comment Exists' if comment_id exists in the comments table", () => {
+    const commentId = 1;
+
+    return expect(checkCommentIdExists(commentId)).resolves.toBe(
+      `Comment Exists`
+    );
+  });
+
+  test("404 Should reject with a Not Found error if comment_id does not exist in the comments table", () => {
+    const commentId = 999;
+
+    return expect(checkCommentIdExists(commentId)).rejects.toEqual({
+      detail: "Comment ID does not exist",
       error: "Not found",
       status: 404,
     });

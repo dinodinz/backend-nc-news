@@ -9,11 +9,10 @@ const {
 const {
   getCommentsByArticleId,
   addCommentByArticleId,
+  deleteCommentById,
 } = require("./controllers/comments");
 const endpoints = require("./endpoints.json");
 app.use(express.json());
-
-//GET
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints });
@@ -27,11 +26,11 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api/articles/:article_id", getArticleById);
 
-//POST
 app.post("/api/articles/:article_id/comments", addCommentByArticleId);
 
-//PATCH
 app.patch("/api/articles/:article_id", updateArticleById);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 //middleware error handlers
 

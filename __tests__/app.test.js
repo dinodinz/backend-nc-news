@@ -3,6 +3,7 @@ const request = require("supertest");
 const jestSorted = require("jest-sorted");
 const app = require("../app.js");
 const seed = require("../db/seeds/seed");
+const { checkCommentIdExists } = require("../db/seeds/utils");
 const testData = require("../db/data/test-data/");
 const db = require("../db/connection");
 
@@ -278,7 +279,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(200)
       .then(({ body: { editedArticle } }) => {
-        console.log(editedArticle);
         expect(editedArticle.votes).toBe(200);
         expect(editedArticle).toEqual(
           expect.objectContaining({
@@ -303,7 +303,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(200)
       .then(({ body: { editedArticle } }) => {
-        console.log(editedArticle);
         expect(editedArticle.votes).toBe(-200);
       });
   });
@@ -357,6 +356,41 @@ describe("PATCH /api/articles/:article_id", () => {
       .then((response) => {
         expect(response.body.error).toBe("Bad Request");
         expect(response.body.msg).toBe("Invalid input syntax");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Should respond with 204 status with response body", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+      .then(() => {
+        return expect(checkCommentIdExists(2)).rejects.toMatchObject({
+          status: 404,
+          error: "Not found",
+          detail: "Comment ID does not exist",
+        }); //checks the updated database to see if the comment_id exist or not
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if the request was carrying a different format for comment_id", () => {
+    return request(app)
+      .delete("/api/comments/A")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid input syntax");
+      });
+  });
+
+  test("404: Should respond with 404 Not found if the request was carrying a valid but not an existing comment_id", () => {
+    return request(app)
+      .delete("/api/comments/888")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found");
+        expect(response.body.msg).toBe("Comment ID does not exist");
       });
   });
 });

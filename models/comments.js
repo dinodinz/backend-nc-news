@@ -1,6 +1,8 @@
-const { request } = require("../app");
 const db = require("../db/connection");
-const { checkArticleIdExists } = require("../db/seeds/utils");
+const {
+  checkArticleIdExists,
+  checkCommentIdExists,
+} = require("../db/seeds/utils");
 
 exports.fetchCommentsByArticleId = (params) => {
   let { article_id } = params;
@@ -22,5 +24,18 @@ exports.insertCommentToArticle = (requestBody, params) => {
 
   return db.query(SQL, values).then((result) => {
     return result.rows[0].body;
+  });
+};
+
+exports.removeCommentById = (params) => {
+  const { comment_id } = params;
+  const SQL = `DELETE FROM comments
+               WHERE comment_id = $1
+               RETURNING *`;
+
+  return checkCommentIdExists(comment_id).then(() => {
+    return db.query(SQL, [comment_id]).then((result) => {
+      return result.rows[0];
+    });
   });
 };
