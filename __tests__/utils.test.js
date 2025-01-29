@@ -1,10 +1,14 @@
+const db = require("../db/connection");
 const {
   convertTimestampToDate,
   createRef,
   formatComments,
+  checkArticleIdExists,
 } = require("../db/seeds/utils");
 
-describe.skip("convertTimestampToDate", () => {
+afterAll(() => db.end());
+
+describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
     const timestamp = 1557572706232;
     const input = { created_at: timestamp };
@@ -40,7 +44,7 @@ describe.skip("convertTimestampToDate", () => {
   });
 });
 
-describe.skip("createRef", () => {
+describe("createRef", () => {
   test("returns an empty object, when passed an empty array", () => {
     const input = [];
     const actual = createRef(input);
@@ -74,7 +78,7 @@ describe.skip("createRef", () => {
   });
 });
 
-describe.skip("formatComments", () => {
+describe("formatComments", () => {
   test("returns an empty array, if passed an empty array", () => {
     const comments = [];
     expect(formatComments(comments, {})).toEqual([]);
@@ -100,5 +104,25 @@ describe.skip("formatComments", () => {
     const comments = [{ created_at: timestamp }];
     const formattedComments = formatComments(comments, {});
     expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
+  });
+});
+
+describe("checkArticleIdExists()", () => {
+  test("Should resolve with a value of 'Category Exists' if article_id exists in the articles table", () => {
+    const articleId = 1;
+
+    return expect(checkArticleIdExists(articleId)).resolves.toBe(
+      `Category Exists`
+    );
+  });
+
+  test("404 Should reject with a Not Found error if article_id does not exist in the articles table", () => {
+    const articleId = 999;
+
+    return expect(checkArticleIdExists(articleId)).rejects.toEqual({
+      detail: "Article ID does not exist",
+      error: "Not found",
+      status: 404,
+    });
   });
 });
