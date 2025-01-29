@@ -167,6 +167,26 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(response.body.msg).toBe("Invalid input syntax for Article ID");
       });
   });
+
+  test("200: Should respond with 200 status and an empty array for valid existing article_ids that doesn't have any comment", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.allComments.length).toBe(0);
+        expect(response.body.allComments).toEqual([]);
+      });
+  });
+
+  test("404: Should respond with 404 Not found if the request was carrying a valid but not an existing article_id", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found");
+        expect(response.body.msg).toBe("Article ID does not exist");
+      });
+  });
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
