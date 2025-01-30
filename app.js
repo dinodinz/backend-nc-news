@@ -56,6 +56,15 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.code === "InvalidQuery") {
+    res.status(400).send({
+      error: "Bad Request",
+      msg: err.detail,
+    });
+  } else next(err);
+});
+
+app.use((err, req, res, next) => {
   if (err.code === "23502") {
     res.status(400).send({
       error: "Bad Request",
