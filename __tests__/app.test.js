@@ -108,7 +108,7 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: Should respond with 200 status when successfully fetching all object articles which should have the expected properties without the body", () => {
+  test("200: Should respond with 200 status when successfully fetching all object articles which should have the expected properties without the body, and must be in descending order by default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -125,10 +125,61 @@ describe("GET /api/articles", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             })
           );
         });
+      });
+  });
+
+  test("200: Responds with an array of article objects that are sorted by based on the sort_by query from the request using the default order DESC", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id")
+      .expect(200)
+      .then(({ body: { allArticles } }) => {
+        expect(allArticles).toBeSortedBy("article_id", { descending: true });
+      });
+  });
+
+  test("200: Responds with an array of article objects that are sorted by based on the sort_by with an order based on the order query value", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&order=ASC") //should allow any letter case values of the query
+      .expect(200)
+      .then(({ body: { allArticles } }) => {
+        expect(allArticles).toBeSortedBy("comment_count", {
+          ascending: true,
+        });
+      });
+  });
+
+  test("200: Should allow users to only carry order on the query and change the default DESC order but still sorted by default created_at", () => {
+    return request(app)
+      .get("/api/articles?order=asc") //should allow any letter case values of the query
+      .expect(200)
+      .then(({ body: { allArticles } }) => {
+        expect(allArticles).toBeSortedBy("created_at", {
+          ascending: true,
+        });
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if sort_by value was not a valid value", () => {
+    return request(app)
+      .get("/api/articles?sort_by=GROOT") //should allow any letter case values of the query
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid sort by value");
+      });
+  });
+
+  test("400: Should respond with 400 Bad Request if order value was not a valid value", () => {
+    return request(app)
+      .get("/api/articles?order=GROOT") //should allow any letter case values of the query
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request");
+        expect(response.body.msg).toBe("Invalid order value");
       });
   });
 });
