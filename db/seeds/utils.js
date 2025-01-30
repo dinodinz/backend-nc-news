@@ -52,3 +52,23 @@ exports.checkCommentIdExists = (comment_id) => {
     } else return "Comment Exists";
   });
 };
+
+exports.checkTopicSlugExists = (topicSlug) => {
+  let SQL = `SELECT * FROM topics 
+  WHERE slug = $1`;
+
+  return db
+    .query(SQL, [topicSlug])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          error: "Not found",
+          detail: "Topic does not exist",
+        });
+      } else return "Topic Exists";
+    })
+    .catch((err) => {
+      return Promise.reject(err);
+    });
+};
