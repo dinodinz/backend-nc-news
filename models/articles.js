@@ -27,19 +27,65 @@ exports.selectArticleById = (params) => {
     });
 };
 
-exports.selectAllArticles = () => {
-  SQL = `SELECT articles.author,
+exports.selectAllArticles = (query) => {
+  const { sort_by, order } = query;
+
+  const sortByValues = [
+    "author",
+    "title",
+    "article_id",
+    "topicData",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  let SQL = `SELECT articles.author,
   articles.title,
   articles.article_id,
   articles.topic,
   articles.created_at,
   articles.votes,
   articles.article_img_url,
-  COUNT(comments.comment_id) AS comment_count
+  COUNT(comments.comment_id)::INT AS comment_count
   FROM articles LEFT JOIN comments
   ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id
-  ORDER BY articles.created_at DESC`;
+  GROUP BY articles.article_id`;
+
+  if (sort_by) {
+    if (sortByValues.includes(sort_by.toLowerCase())) {
+      SQL += ` ORDER BY ${sort_by}`;
+    } else {
+      return Promise.reject({
+        status: 400,
+        error: "Bad Request",
+        code: "InvalidQuery",
+        detail: "Invalid sort by value",
+      });
+    }
+  }
+
+  if (order) {
+    if (order.toLowerCase() === "asc" || order.toLowerCase() === "desc") {
+      if (sort_by) {
+        SQL += ` ${order}`;
+      } else SQL += ` ORDER BY articles.created_at ${order}`;
+    } else {
+      return Promise.reject({
+        status: 400,
+        error: "Bad Request",
+        code: "InvalidQuery",
+        detail: "Invalid order value",
+      });
+    }
+  }
+
+  if (order === undefined && sort_by === undefined) {
+    SQL += ` ORDER BY articles.created_at DESC`;
+  } else if (sort_by && order === undefined) {
+    SQL += ` DESC`;
+  }
 
   return db.query(SQL).then((result) => {
     return result.rows;
