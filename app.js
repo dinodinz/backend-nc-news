@@ -40,8 +40,7 @@ app.delete("/api/comments/:comment_id", deleteCommentById);
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({
-      error: "Bad Request",
-      msg: "Invalid input syntax",
+      error: "Bad Request: Invalid input syntax",
     });
   } else next(err);
 });
@@ -49,8 +48,7 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "23503" || err.error === "Not found") {
     res.status(404).send({
-      error: "Not found",
-      msg: err.detail,
+      error: `Not found: ${err.detail}`,
     });
   } else next(err);
 });
@@ -58,8 +56,7 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "InvalidQuery") {
     res.status(400).send({
-      error: "Bad Request",
-      msg: err.detail,
+      error: `Bad Request: ${err.detail}`,
     });
   } else next(err);
 });
@@ -67,8 +64,7 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "23502") {
     res.status(400).send({
-      error: "Bad Request",
-      msg: "Invalid request body format",
+      error: "Bad Request: Invalid request body format",
     });
   } else next(err);
 });

@@ -91,8 +91,9 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe("Article ID does not exist");
+        expect(response.body.error).toBe(
+          "Not found: Article ID does not exist"
+        );
       });
   });
 
@@ -101,8 +102,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/A")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 });
@@ -113,9 +113,9 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { allArticles } }) => {
-        expect(allArticles).toBeSortedBy("created_at", { descending: true }); //checks if the response is sorted by created_at using descending order by default
+        expect(allArticles).toBeSortedBy("created_at", { descending: true });
         allArticles.forEach((article) => {
-          expect(article).not.toHaveProperty("body"); //to check if key/property is not existing
+          expect(article).not.toHaveProperty("body");
           expect(article).toEqual(
             expect.objectContaining({
               author: expect.any(String),
@@ -143,7 +143,7 @@ describe("GET /api/articles", () => {
 
   test("200: Responds with an array of article objects that are sorted by based on the sort_by with an order based on the order query value", () => {
     return request(app)
-      .get("/api/articles?sort_by=comment_count&order=ASC") //should allow any letter case values of the query
+      .get("/api/articles?sort_by=comment_count&order=ASC")
       .expect(200)
       .then(({ body: { allArticles } }) => {
         expect(allArticles).toBeSortedBy("comment_count", {
@@ -154,7 +154,7 @@ describe("GET /api/articles", () => {
 
   test("200: Should allow users to only carry order on the query and change the default DESC order but still sorted by default created_at", () => {
     return request(app)
-      .get("/api/articles?order=asc") //should allow any letter case values of the query
+      .get("/api/articles?order=asc")
       .expect(200)
       .then(({ body: { allArticles } }) => {
         expect(allArticles).toBeSortedBy("created_at", {
@@ -165,21 +165,51 @@ describe("GET /api/articles", () => {
 
   test("400: Should respond with 400 Bad Request if sort_by value was not a valid value", () => {
     return request(app)
-      .get("/api/articles?sort_by=GROOT") //should allow any letter case values of the query
+      .get("/api/articles?sort_by=GROOT")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid sort by value");
+        expect(response.body.error).toBe("Bad Request: Invalid sort by value");
       });
   });
 
   test("400: Should respond with 400 Bad Request if order value was not a valid value", () => {
     return request(app)
-      .get("/api/articles?order=GROOT") //should allow any letter case values of the query
+      .get("/api/articles?order=GROOT")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid order value");
+        expect(response.body.error).toBe("Bad Request: Invalid order value");
+      });
+  });
+
+  test("200: Response should be filtered using the topic value instead of showing everything from the table.", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { allArticles } }) => {
+        allArticles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+
+  test("200: Should be capable of handling sort_by=article_id and order=asc along with topic=mitch query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&order=asc&topic=mitch")
+      .expect(200)
+      .then(({ body: { allArticles } }) => {
+        expect(allArticles).toBeSortedBy("article_id", { ascending: true });
+        allArticles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+
+  test("404: Should respond with 404 error if the topic slug is not existing in the table topic", () => {
+    return request(app)
+      .get("/api/articles?topic=space")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found: Topic does not exist");
       });
   });
 });
@@ -192,8 +222,8 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { allComments } }) => {
-        expect(Array.isArray(allComments)).toBe(true); //checks if value returned should be an array
-        expect(allComments).toBeSortedBy("created_at", { descending: true }); //checks if response array is sorted by created_at using descending order
+        expect(Array.isArray(allComments)).toBe(true);
+        expect(allComments).toBeSortedBy("created_at", { descending: true });
 
         allComments.forEach((comment) => {
           expect(comment).toEqual(
@@ -215,8 +245,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/A/comments")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 
@@ -235,8 +264,9 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/999/comments")
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe("Article ID does not exist");
+        expect(response.body.error).toBe(
+          "Not found: Article ID does not exist"
+        );
       });
   });
 });
@@ -262,10 +292,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(payload)
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe(
-          'Key (article_id)=(999) is not present in table "articles".'
-        ); //not sure if this is the right approach to test as i am mapping msg to detail which might be dynamic
+        expect(response.body.error).toBe(
+          `Not found: Key (article_id)=(999) is not present in table "articles".`
+        );
       });
   });
 
@@ -277,8 +306,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(payload)
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 
@@ -290,9 +318,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(payload)
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe(
-          'Key (author)=(Groot) is not present in table "users".'
+        expect(response.body.error).toBe(
+          `Not found: Key (author)=(Groot) is not present in table "users".`
         );
       });
   });
@@ -305,8 +332,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(payload)
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid request body format");
+        expect(response.body.error).toBe(
+          "Bad Request: Invalid request body format"
+        );
       });
   });
 
@@ -315,8 +343,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid request body format");
+        expect(response.body.error).toBe(
+          "Bad Request: Invalid request body format"
+        );
       });
   });
 });
@@ -330,7 +359,6 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(200)
       .then(({ body: { editedArticle } }) => {
-        expect(editedArticle.votes).toBe(200);
         expect(editedArticle).toEqual(
           expect.objectContaining({
             article_id: expect.any(Number),
@@ -339,7 +367,7 @@ describe("PATCH /api/articles/:article_id", () => {
             author: expect.any(String),
             body: expect.any(String),
             created_at: expect.any(String),
-            votes: expect.any(Number),
+            votes: 200,
             article_img_url: expect.any(String),
           })
         );
@@ -366,8 +394,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 
@@ -379,8 +406,9 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe("Article ID does not exist");
+        expect(response.body.error).toBe(
+          "Not found: Article ID does not exist"
+        );
       });
   });
 
@@ -392,8 +420,9 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid request body format");
+        expect(response.body.error).toBe(
+          "Bad Request: Invalid request body format"
+        );
       });
   });
 
@@ -405,8 +434,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send(payload)
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 });
@@ -421,7 +449,7 @@ describe("DELETE /api/comments/:comment_id", () => {
           status: 404,
           error: "Not found",
           detail: "Comment ID does not exist",
-        }); //checks the updated database to see if the comment_id exist or not
+        });
       });
   });
 
@@ -430,8 +458,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/A")
       .expect(400)
       .then((response) => {
-        expect(response.body.error).toBe("Bad Request");
-        expect(response.body.msg).toBe("Invalid input syntax");
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
       });
   });
 
@@ -440,8 +467,9 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/888")
       .expect(404)
       .then((response) => {
-        expect(response.body.error).toBe("Not found");
-        expect(response.body.msg).toBe("Comment ID does not exist");
+        expect(response.body.error).toBe(
+          "Not found: Comment ID does not exist"
+        );
       });
   });
 });
