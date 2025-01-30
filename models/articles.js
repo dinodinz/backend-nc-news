@@ -4,26 +4,21 @@ const {
   checkTopicSlugExists,
 } = require("../db/seeds/utils");
 
-exports.selectArticleById = (params) => {
+exports.selectArticleById = async (params) => {
   let { article_id } = params;
-  let SQL = `SELECT * FROM articles`;
-  let values = [];
+  let SQL = `SELECT articles.*,COUNT(comment_id)::INT AS comment_count 
+             FROM articles LEFT JOIN comments 
+             ON articles.article_id = comments.article_id
+             WHERE articles.article_id = $1 GROUP BY articles.article_id`;
 
-  if (article_id) {
-    SQL += ` WHERE article_id = $1`;
-    values.push(article_id);
-  }
+  await checkArticleIdExists(article_id).catch((err) => {
+    return Promise.reject(err);
+  });
 
   return db
-    .query(SQL, values)
+    .query(SQL, [article_id])
     .then((result) => {
-      if (result.rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          error: "Not found",
-          detail: "Article ID does not exist",
-        });
-      } else return result.rows[0];
+      return result.rows[0];
     })
     .catch((err) => {
       return Promise.reject(err);
