@@ -1,5 +1,8 @@
 const db = require("../db/connection");
-const { checkArticleIdExists } = require("../db/seeds/utils");
+const {
+  checkArticleIdExists,
+  checkTopicSlugExists,
+} = require("../db/seeds/utils");
 
 exports.selectArticleById = (params) => {
   let { article_id } = params;
@@ -27,8 +30,9 @@ exports.selectArticleById = (params) => {
     });
 };
 
-exports.selectAllArticles = (query) => {
-  const { sort_by, order } = query;
+exports.selectAllArticles = async (queries) => {
+  const { sort_by, order, topic } = queries;
+  const args = [];
 
   const sortByValues = [
     "author",
@@ -50,8 +54,22 @@ exports.selectAllArticles = (query) => {
   articles.article_img_url,
   COUNT(comments.comment_id)::INT AS comment_count
   FROM articles LEFT JOIN comments
-  ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id`;
+  ON articles.article_id = comments.article_id`;
+
+  if (topic) {
+    const checkTopic = await checkTopicSlugExists(topic)
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => {
+        return Promise.reject(err);
+      });
+
+    if (checkTopic === "Topic Exists") {
+      SQL += ` WHERE topic = $1 GROUP BY articles.article_id`;
+      args.push(topic);
+    }
+  } else SQL += ` GROUP BY articles.article_id`;
 
   if (sort_by) {
     if (sortByValues.includes(sort_by.toLowerCase())) {
@@ -87,7 +105,7 @@ exports.selectAllArticles = (query) => {
     SQL += ` DESC`;
   }
 
-  return db.query(SQL).then((result) => {
+  return db.query(SQL, args).then((result) => {
     return result.rows;
   });
 };
