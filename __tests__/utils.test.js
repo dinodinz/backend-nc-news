@@ -5,6 +5,7 @@ const {
   formatComments,
   checkArticleIdExists,
   checkCommentIdExists,
+  checkTopicSlugExists,
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -142,6 +143,24 @@ describe("checkCommentIdExists()", () => {
 
     return expect(checkCommentIdExists(commentId)).rejects.toEqual({
       detail: "Comment ID does not exist",
+      error: "Not found",
+      status: 404,
+    });
+  });
+});
+
+describe("checkTopicSlugExists()", () => {
+  test("Should resolve with a value of 'Topic Exists' if topic exists in the topics table", () => {
+    const topic = "cats";
+
+    return expect(checkTopicSlugExists(topic)).resolves.toBe(`Topic Exists`);
+  });
+
+  test("404 Should reject with a Not Found error if topic does not exist in the topics table", () => {
+    const topic = "space";
+
+    return expect(checkTopicSlugExists(topic)).rejects.toEqual({
+      detail: "Topic does not exist",
       error: "Not found",
       status: 404,
     });
