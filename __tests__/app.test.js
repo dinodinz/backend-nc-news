@@ -65,15 +65,14 @@ describe("GET /api/articles/:article_id", () => {
     return request(app).get("/api/articles/1").expect(200);
   });
 
-  test("200: Should respond with an article object which has author,title,article_id,body,topic,created_at,votes,article_img_url properties", () => {
+  test("200: Should respond with an article object which has author,title,article_id,body,topic,created_at,votes,article_img_url properties,comment_count", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
       .then(({ body: { article } }) => {
-        expect(article.article_id).toBe(1);
         expect(article).toEqual(
           expect.objectContaining({
-            article_id: expect.any(Number),
+            article_id: 1,
             title: expect.any(String),
             topic: expect.any(String),
             author: expect.any(String),
@@ -81,6 +80,7 @@ describe("GET /api/articles/:article_id", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
+            comment_count: 11,
           })
         );
       });
