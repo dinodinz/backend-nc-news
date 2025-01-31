@@ -6,6 +6,7 @@ const {
   checkArticleIdExists,
   checkCommentIdExists,
   checkTopicSlugExists,
+  checkUsernameExists,
 } = require("../db/seeds/utils");
 
 afterAll(() => db.end());
@@ -161,6 +162,26 @@ describe("checkTopicSlugExists()", () => {
 
     return expect(checkTopicSlugExists(topic)).rejects.toEqual({
       detail: "Topic does not exist",
+      error: "Not found",
+      status: 404,
+    });
+  });
+});
+
+describe("checkUsernameExists()", () => {
+  test("Should resolve with a value of 'Username Exists' if username exists in the users table", () => {
+    const username = "lurker";
+
+    return expect(checkUsernameExists(username)).resolves.toBe(
+      `Username Exists`
+    );
+  });
+
+  test("404 Should reject with a Not Found error if a username does not exist in the users table", () => {
+    const username = "space";
+
+    return expect(checkUsernameExists(username)).rejects.toEqual({
+      detail: "Username does not exist",
       error: "Not found",
       status: 404,
     });
