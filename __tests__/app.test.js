@@ -494,3 +494,29 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("GET /api/users/:username", () => {
+  test("200: Responds with user object with the properties username,avatar_url,name", () => {
+    return request(app)
+      .get("/api/users/lurker")
+      .expect(200)
+      .then(({ body: { user } }) => {
+        expect(user).toEqual(
+          expect.objectContaining({
+            username: expect.any(String),
+            avatar_url: expect.any(String),
+            name: expect.any(String),
+          })
+        );
+      });
+  });
+
+  test("404: Responds with 404 Not found if the username doesn't exist in the username table", () => {
+    return request(app)
+      .get("/api/users/groot")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found: Username does not exist");
+      });
+  });
+});
