@@ -72,3 +72,17 @@ exports.checkTopicSlugExists = (topicSlug) => {
       return Promise.reject(err);
     });
 };
+
+exports.checkUsernameExists = (username) => {
+  let SQL = `SELECT * FROM users 
+  WHERE username = $1`;
+  return db.query(SQL, [username]).then((result) => {
+    if (result.rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        error: "Not found",
+        detail: "Username does not exist",
+      });
+    } else return "Username Exists";
+  });
+};
