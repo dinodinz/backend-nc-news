@@ -39,3 +39,18 @@ exports.removeCommentById = (params) => {
     });
   });
 };
+
+exports.editVoteByCommentId = (inc_votes, comment_id) => {
+  const args = [inc_votes, comment_id];
+  const SQL = `UPDATE comments
+               SET
+               votes = votes + $1
+               WHERE comment_id = $2  
+               RETURNING *`;
+
+  return checkCommentIdExists(comment_id).then(() => {
+    return db.query(SQL, args).then((result) => {
+      return result.rows[0];
+    });
+  });
+};
