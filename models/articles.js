@@ -2,6 +2,7 @@ const db = require("../db/connection");
 const {
   checkArticleIdExists,
   checkTopicSlugExists,
+  checkUsernameExists,
 } = require("../db/seeds/utils");
 
 exports.selectArticleById = async (params) => {
@@ -120,5 +121,34 @@ exports.editArticleById = (reqBody, params) => {
     return db.query(SQL, values).then((result) => {
       return result.rows[0];
     });
+  });
+};
+
+exports.insertNewArticle = async (reqBody) => {
+  const { author, title, body, topic, article_img_url } = reqBody;
+
+  const values = [author, title, body, topic];
+
+  let SQL = `INSERT INTO articles
+               (author,title,body,topic`;
+
+  if (
+    (await checkTopicSlugExists(topic)) === "Topic Exists" &&
+    (await checkUsernameExists(author)) === "Username Exists"
+  ) {
+    if (article_img_url) {
+      SQL += `,article_img_url)
+            VALUES
+            ($1,$2,$3,$4,$5) RETURNING*`;
+      values.push(article_img_url);
+    } else {
+      SQL += `)
+            VALUES
+            ($1,$2,$3,$4) RETURNING*`;
+    }
+  }
+
+  return db.query(SQL, values).then((result) => {
+    return result.rows[0];
   });
 };

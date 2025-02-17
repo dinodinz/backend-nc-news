@@ -520,3 +520,127 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Responds with comment object with the updated vote property value", () => {
+    const payload = { inc_votes: 200 };
+    return request(app)
+      .patch("/api/comments/2")
+      .send(payload)
+      .expect(200)
+      .then(({ body: { updatedVote } }) => {
+        expect(updatedVote.votes).toBe(214);
+      });
+  });
+
+  test("404: Responds with 404 Not found if the comment ID is does not exists", () => {
+    const payload = { inc_votes: 200 };
+    return request(app)
+      .patch("/api/comments/999")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe(
+          "Not found: Comment ID does not exist"
+        );
+      });
+  });
+
+  test("400: Responds with Bad Request if comment_id is using a different format", () => {
+    const payload = { inc_votes: 200 };
+    return request(app)
+      .patch("/api/comments/A")
+      .send(payload)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe("Bad Request: Invalid input syntax");
+      });
+  });
+
+  test("400: Responds with Bad Request if JSON body sent was incomplete or if there was no request body sent", () => {
+    const payload = { inc_votes: 200 };
+    return request(app)
+      .patch("/api/comments/2")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.error).toBe(
+          "Bad Request: Invalid request body format"
+        );
+      });
+  });
+});
+
+describe("POST /api/articles", () => {
+  test("201: Should respond with 201 status along with the posted article", () => {
+    const payload = {
+      author: "rogersop",
+      title: "Interstellar",
+      body: "I AM GROOOT!!",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles/")
+      .send(payload)
+      .expect(201)
+      .then(({ body: { postedArticle } }) => {
+        expect(postedArticle.title).toBe("Interstellar");
+        expect(postedArticle.author).toBe("rogersop");
+        expect(postedArticle.body).toBe("I AM GROOOT!!");
+        expect(postedArticle.topic).toBe("cats");
+      });
+  });
+
+  test("404: Should respond with 404 not found if the author does not exist", () => {
+    const payload = {
+      author: "groot",
+      title: "Interstellar",
+      body: "I AM GROOOT!!",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles/")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found: Username does not exist");
+      });
+  });
+
+  test("404: Should respond with 404 not found if the topic does not exist", () => {
+    const payload = {
+      author: "rogersop",
+      title: "Interstellar",
+      body: "I AM GROOOT!!",
+      topic: "space",
+    };
+
+    return request(app)
+      .post("/api/articles/")
+      .send(payload)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Not found: Topic does not exist");
+      });
+  });
+
+  test("201: Should respond with the added article using the default value for article_img_url given we do not carry it on the request body", () => {
+    const payload = {
+      author: "rogersop",
+      title: "Interstellar",
+      body: "I AM GROOOT!!",
+      topic: "cats",
+    };
+
+    return request(app)
+      .post("/api/articles/")
+      .send(payload)
+      .expect(201)
+      .then(({ body: { postedArticle } }) => {
+        expect(postedArticle.article_img_url).toBe(
+          "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+        );
+      });
+  });
+});
