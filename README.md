@@ -69,4 +69,5 @@ To do this you need to use "npm ci" instead of "npm i" as this will install the 
 
 8.)You can now do some testing by running "npm test"
 
-## Important: In order for the whole setup to work, you need to have the .env.test and .env.development files created which was stated at the beggining of this guide.
+## Important:
+In order for the whole setup to work, you need to have the .env.test and .env.development files created which was stated at the beggining of this guide.
