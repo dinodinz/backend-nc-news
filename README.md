@@ -1,9 +1,9 @@
 
-# Northcoders News API
+## Northcoders News API
 
 Backend server created for Northcoder project to host database for articles, comments, users and topics. 
 
-Minimum required versions:
+## Minimum required versions:
 
 Node.js = v23.3.0
 PSQL = 14.14
