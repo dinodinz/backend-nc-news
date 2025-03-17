@@ -16,7 +16,7 @@ PSQL = 14.14
 - **Jest & Supertest** (for testing)
 - **Husky** (additional layer of testing)
 
-# Instructions:
+## Instructions:
 
 For anyone cloning this repo, since the environment files are added on the gitignore list, then you will not have a copy of them on your local machine.
 
@@ -28,7 +28,7 @@ You can add two new files named ".env.test" and ".env.development" on the root l
 
 .env.development: PGDATABASE=nc_news
 
-# API ENDPOINT HOSTED ON RENDER:
+## API ENDPOINT HOSTED ON RENDER:
 
 Endpoint: https://northcoders-reddit.onrender.com
 
@@ -38,11 +38,11 @@ Example: https://northcoders-reddit.onrender.com/api/topics
 
 NOTE: API paths are availble in the app.js file
 
-# SUMMARY:
+## SUMMARY:
 
 This is something similar to Reddit where people can share and post articles and also comment and vote on them. Using Express.js, node-postgres and pg-format mostly on the backend.
 
-# DEPENDENCIES
+## DEPENDENCIES
 
 ==============
 You will need to install the minimum dependency versions shown on the package.json file to avoid any issues when running the app
@@ -51,7 +51,7 @@ If you have installed recent versions and are having issues, then installing the
 
 To do this you need to use "npm ci" instead of "npm i" as this will install the exact versions on the package.json file.
 
-# SETUP ON YOUR LOCAL MACHINE
+## SETUP ON YOUR LOCAL MACHINE
 
 1.) Go here https://github.com/dinodinz/be-nc-news
 
@@ -69,4 +69,4 @@ To do this you need to use "npm ci" instead of "npm i" as this will install the 
 
 8.)You can now do some testing by running "npm test"
 
-# IMPORTANT: In order for the whole setup to work, you need to have the .env.test and .env.development files created which was stated at the beggining of this guide.
+## IMPORTANT: In order for the whole setup to work, you need to have the .env.test and .env.development files created which was stated at the beggining of this guide.
