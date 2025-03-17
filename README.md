@@ -1,12 +1,3 @@
-## 📖 Table of Contents
-- [About the Project](#about-the-project)
-- [Tech Stack](#tech-stack)
-- [Setup & Installation](#setup--installation)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
 
 # Northcoders News API
 
@@ -16,6 +7,13 @@ Minimum required versions:
 
 Node.js = v23.3.0
 PSQL = 14.14
+
+## 🛠 Tech Stack
+- **Node.js** (v23.3.0)
+- **Express.js**
+- **PostgreSQL** (14.14)
+- **pg & pg-format** (for database interaction)
+- **Jest & Supertest** (for testing)
 
 # Instructions:
 
