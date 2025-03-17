@@ -1,6 +1,6 @@
 const endpointsJson = require("../endpoints.json");
 const request = require("supertest");
-const jestSorted = require("jest-sorted");
+const { toBeSortedBy } = require("jest-sorted");
 const app = require("../app.js");
 const seed = require("../db/seeds/seed");
 const { checkCommentIdExists } = require("../db/seeds/utils");
