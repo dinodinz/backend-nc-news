@@ -14,6 +14,7 @@ PSQL = 14.14
 - **PostgreSQL** (14.14)
 - **pg & pg-format** (for database interaction)
 - **Jest & Supertest** (for testing)
+- **Husky** (additional layer of testing)
 
 # Instructions:
 
