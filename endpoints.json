@@ -25,5 +25,135 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "responds with the specific article",
+    "queries": [],
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": 1,
+          "title": "Living in the shadow of a great man!",
+          "topic": "mitch",
+          "author": "butter_bridge",
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 100,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": 11
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all commments from a specific article",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 5,
+          "body": "I hate streaming noses",
+          "article_id": 1,
+          "author": "icellusedkars",
+          "votes": 0,
+          "created_at": "2020-11-03T21:00:00.000Z"
+        },
+        {
+          "comment_id": 2,
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          "article_id": 1,
+          "author": "butter_bridge",
+          "votes": 14,
+          "created_at": "2020-10-31T03:03:00.000Z"
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "endpoint used to update an article, will respond with the edited article object",
+    "queries": [],
+    "exampleResponse": {
+      "postedComent": "I AM GROOT"
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "endpoint used to add a comment, will respond with the comment body",
+    "queries": [],
+    "exampleResponse": {
+      "editedArticle": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 200,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "endpoint to delete a certain comment using comment_id",
+    "queries": [],
+    "exampleResponse": {}
+  },
+  "GET /api/users": {
+    "description": "endpoint to fetch all users",
+    "queries": [],
+    "exampleResponse": {
+      "allUsers": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        }
+      ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "endpoint to grab a certain user using username",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "lurker",
+        "name": "do_nothing",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "endpoint to grab a certain user using username",
+    "queries": [],
+    "exampleResponse": {
+      "updatedVote": {
+        "comment_id": 2,
+        "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        "article_id": 1,
+        "author": "butter_bridge",
+        "votes": 214,
+        "created_at": "2020-10-31T03:03:00.000Z"
+      }
+    }
+  },
+  "POST /api/articles": {
+    "description": "endpoint to post a new article,responds with the posted article object",
+    "queries": [],
+    "exampleResponse": {
+      "postedArticle": {
+        "article_id": 14,
+        "title": "Interstellar",
+        "topic": "cats",
+        "author": "rogersop",
+        "body": "I AM GROOOT!!",
+        "created_at": "2025-03-17T12:44:50.965Z",
+        "votes": 0,
+        "article_img_url": "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+      }
+    }
   }
 }
