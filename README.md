@@ -1,7 +1,7 @@
 
 ## Northcoders News API
 
-Backend server created for Northcoder project to host database for articles, comments, users and topics using a relation database setup hosted on Supabase and Render.
+Backend server created for Northcoder project to host database for articles, comments, users and topics using a relational database setup hosted on Supabase and Render.
 
 ## Minimum required versions:
 
