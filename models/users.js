@@ -20,3 +20,15 @@ exports.fetchUserByUsername = (username) => {
     });
   });
 };
+
+exports.createUser = (reqBody) => {
+  const { username, name, avatar_url } = reqBody;
+
+  let SQL = `INSERT INTO users
+             (username,name,avatar_url) 
+             VALUES ($1,$2,$3) RETURNING*`;
+
+  return db.query(SQL, [username, name, avatar_url]).then((result) => {
+    return result.rows[0];
+  });
+};

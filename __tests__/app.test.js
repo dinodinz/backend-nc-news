@@ -644,3 +644,21 @@ describe("POST /api/articles", () => {
       });
   });
 });
+
+describe("POST /api/users", () => {
+  test("201: Should respond with 201 status along with the posted article", () => {
+    const payload = {
+      username: "zazalicious",
+      name: "Zadie",
+    };
+
+    return request(app)
+      .post("/api/users/")
+      .send(payload)
+      .expect(201)
+      .then(({ body: { createdUser } }) => {
+        expect(createdUser.username).toBe("zazalicious");
+        expect(createdUser.name).toBe("Zadie");
+      });
+  });
+});
