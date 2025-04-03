@@ -43,9 +43,9 @@ exports.deleteCommentById = (req, res, next) => {
 
 exports.updateVoteByCommentId = (req, res, next) => {
   const { comment_id } = req.params;
-  const { inc_votes } = req.body;
+  const { updateVote, update } = req.body;
 
-  editVoteByCommentId(inc_votes, comment_id)
+  editVoteByCommentId(updateVote, update, comment_id)
     .then((updatedVote) => {
       res.status(200).send({ updatedVote: updatedVote });
     })
