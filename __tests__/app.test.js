@@ -523,18 +523,18 @@ describe("GET /api/users/:username", () => {
 
 describe("PATCH /api/comments/:comment_id", () => {
   test("200: Responds with comment object with the updated vote property value", () => {
-    const payload = { inc_votes: 200 };
+    const payload = { updateVote: 500, update: "increase" };
     return request(app)
       .patch("/api/comments/2")
       .send(payload)
       .expect(200)
       .then(({ body: { updatedVote } }) => {
-        expect(updatedVote.votes).toBe(214);
+        expect(updatedVote.votes).toBe(500);
       });
   });
 
   test("404: Responds with 404 Not found if the comment ID is does not exists", () => {
-    const payload = { inc_votes: 200 };
+    const payload = { updateVote: 200, update: "increase" };
     return request(app)
       .patch("/api/comments/999")
       .send(payload)
@@ -547,7 +547,7 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 
   test("400: Responds with Bad Request if comment_id is using a different format", () => {
-    const payload = { inc_votes: 200 };
+    const payload = { updateVote: 200, update: "increase" };
     return request(app)
       .patch("/api/comments/A")
       .send(payload)
@@ -558,7 +558,7 @@ describe("PATCH /api/comments/:comment_id", () => {
   });
 
   test("400: Responds with Bad Request if JSON body sent was incomplete or if there was no request body sent", () => {
-    const payload = { inc_votes: 200 };
+    const payload = { updateVote: 200, update: "increase" };
     return request(app)
       .patch("/api/comments/2")
       .expect(400)
